@@ -174,7 +174,7 @@ void append<value_type::boolean>(std::ostream& os, const value& val, const list_
 std::ostream& value::write(std::ostream& os, const list_table* lists) const
 {
 	if (type() < value_type::PRINT_BEGIN || type() >= value_type::PRINT_END) {
-		throw ink_exception("printing this type is not supported");
+		ink::internal::throw_exception("printing this type is not supported");
 	}
 	append(os, *this, lists);
 	return os;

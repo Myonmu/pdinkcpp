@@ -1,5 +1,4 @@
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
 list(APPEND SOURCES 
     array.h
     choice.cpp
@@ -38,7 +37,7 @@ list(APPEND COLLECTION_SOURCES
 )
 FILE(GLOB PUBLIC_HEADERS "include/*")
 
-source_group(Collections REGULAR_EXPRESSION collections/.*)
+source_group(collections REGULAR_EXPRESSION collections/.*)
 add_library(inkcpp_o OBJECT ${SOURCES} ${COLLECTION_SOURCES})
 target_include_directories(inkcpp_o PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -56,12 +55,3 @@ target_link_libraries(inkcpp_o PRIVATE inkcpp_shared)
 target_link_libraries(inkcpp PRIVATE inkcpp_shared)
 # Make sure this project and all dependencies use the C++17 standard
 target_compile_features(inkcpp PUBLIC cxx_std_17)
-
-
-# Unreal installation
-list(REMOVE_ITEM SOURCES "avl_array.h")
-install(FILES "avl_array.h" DESTINATION "inkcpp/Source/ThirdParty/Private"
-		COMPONENT unreal EXCLUDE_FROM_ALL)
-install(FILES ${SOURCES} DESTINATION "inkcpp/Source/inkcpp/Private/ink/" COMPONENT unreal EXCLUDE_FROM_ALL)
-install(FILES ${PUBLIC_HEADERS} DESTINATION "inkcpp/Source/inkcpp/Public/ink" COMPONENT unreal EXCLUDE_FROM_ALL)
-install(FILES ${COLLECTION_SOURCES} DESTINATION "inkcpp/Source/inkcpp/Private/ink/collections/" COMPONENT unreal EXCLUDE_FROM_ALL)

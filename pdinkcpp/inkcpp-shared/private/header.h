@@ -35,7 +35,8 @@ namespace ink::internal {
 				none = 0,
 				same = 0x0001,
 				differ = 0x0100
-			} endien = endian_types::none;
+			}
+            endien = endian_types::none;
 			uint32_t ink_version_number = 0;
 			uint32_t ink_bin_version_number = 0;
 			static constexpr size_t Size = ///< actual data size of Header,

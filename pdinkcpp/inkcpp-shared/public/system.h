@@ -22,7 +22,12 @@
 #	include <cctype>
 #	include <cstdint>
 #	include <cstdarg>
+#include <ctime>
+
 #endif
+
+#include "pdcpp/pdnewlib.h"
+#include "pdcpp/core/GlobalPlaydateAPI.h"
 
 namespace ink
 {
@@ -72,14 +77,32 @@ struct list_flag {
 
 	bool operator==(const list_flag& o) const { return list_id == o.list_id && flag == o.flag; }
 
-	bool operator!=(const list_flag& o) const { return ! (*this == o); }
+	bool operator!=(const list_flag& o) const { return ! (list_id == o.list_id && flag == o.flag); }
 };
 
 /** value of an unset list_flag */
 constexpr list_flag null_flag{-1, -1};
 /** value representing an empty list */
 constexpr list_flag empty_flag{-1, 0};
+#ifdef INK_ENABLE_STL
+/** exception type thrown if something goes wrong */
+    using ink_exception = std::runtime_error;
+#else
+    // Non-STL exception class
+class ink_exception
+{
+public:
+	ink_exception(const char* msg)
+	    : _msg(msg)
+	{
+	}
 
+	inline const char* message() const { return _msg; }
+
+private:
+	const char* _msg;
+};
+#endif
 namespace internal
 {
 	/** Checks if a string is only whitespace*/
@@ -98,6 +121,14 @@ namespace internal
 			}
 		}
 	}
+
+    static void throw_exception(const char* string) {
+        pdcpp::GlobalPlaydateAPI::get()->system->error(string);
+    }
+
+    static uint32_t get_time() {
+        return static_cast<uint32_t>(pdcpp::GlobalPlaydateAPI::get()->system->getCurrentTimeMilliseconds());
+    }
 
 	/** check if character can be only part of a word, when two part of word characters put together
 	 * the will be a space inserted I049
@@ -120,27 +151,9 @@ namespace internal
 	/** populate memory with Zero */
 	void zero_memory(void* buffer, size_t length);
 #endif
-} // namespace internal
+    } // namespace internal
 
-#ifdef INK_ENABLE_STL
-/** exception type thrown if something goes wrong */
-using ink_exception = std::runtime_error;
-#else
-// Non-STL exception class
-class ink_exception
-{
-public:
-	ink_exception(const char* msg)
-	    : _msg(msg)
-	{
-	}
 
-	inline const char* message() const { return _msg; }
-
-private:
-	const char* _msg;
-};
-#endif
 
 // assert
 #ifndef INK_ENABLE_UNREAL
@@ -155,9 +168,9 @@ void ink_assert(bool condition, const char* msg = nullptr, Args... args)
 		if constexpr (sizeof...(args) > 0) {
 			char* message = static_cast<char*>(malloc(snprintf(nullptr, 0, msg, args...) + 1));
 			sprintf(message, msg, args...);
-			throw ink_exception(message);
+			ink::internal::throw_exception(message);
 		} else {
-			throw ink_exception(msg);
+            ink::internal::throw_exception(msg);
 		}
 	}
 }
@@ -166,7 +179,7 @@ template<typename... Args>
 [[noreturn]] inline void ink_assert(const char* msg = nullptr, Args... args)
 {
 	ink_assert(false, msg, args...);
-	exit(EXIT_FAILURE);
+	//exit(EXIT_FAILURE);
 }
 #else
 /** platform indipendent assert(false) with message.

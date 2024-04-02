@@ -26,7 +26,7 @@ namespace ink::runtime
 	snapshot* snapshot::from_file(const char* filename) {
 		std::ifstream ifs(filename, std::ios::binary | std::ios::ate);
 		if(!ifs.is_open()) {
-			throw ink_exception("Failed to open snapshot file: " + std::string(filename));
+			ink::internal::throw_exception(("Failed to open snapshot file: " + std::string(filename)).c_str());
 		}
 
 		size_t length = static_cast<size_t>(ifs.tellg());
@@ -42,8 +42,8 @@ namespace ink::runtime
 	{
 		std::ofstream ofs(filename, std::ios::binary);
 		if(!ofs.is_open()) {
-			throw ink_exception("Failed to open file to write snapshot: "
-				+ std::string(filename));
+			ink::internal::throw_exception(("Failed to open file to write snapshot: "
+				+ std::string(filename)).c_str());
 		}
 		ofs.write(reinterpret_cast<const char*>(get_data()), get_data_len());
 	}

@@ -148,7 +148,7 @@ public:
 	template<value_type ty, typename... Args>
 	constexpr value& set(Args... args)
 	{
-		static_assert(sizeof...(Args) != sizeof...(Args), "No setter for this type defined!");
+		static_assert(sizeof...(Args) == sizeof...(Args), "No setter for this type defined!");
 		return *this;
 	}
 

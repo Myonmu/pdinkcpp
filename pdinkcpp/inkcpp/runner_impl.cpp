@@ -371,7 +371,7 @@ runner_impl::runner_impl(const story_impl* data, globals global)
     , _done(nullptr)
     , _choices()
     , _container(ContainerData{})
-    , _rng(time(NULL))
+    , _rng(ink::internal::get_time())
 {
 	_ptr               = _story->instructions();
 	_evaluation_mode   = false;
@@ -743,7 +743,7 @@ bool runner_impl::line_step()
 
 void runner_impl::step()
 {
-#ifndef INK_ENABLE_UNREAL
+#if !defined(INK_ENABLE_UNREAL) && !defined(TARGET_PLAYDATE)
 	try
 #endif
 	{
@@ -802,7 +802,7 @@ void runner_impl::step()
 					if (_evaluation_mode) {
 						_eval.push(value{}.set<value_type::value_pointer>(val, static_cast<char>(flag) - 1));
 					} else {
-						inkFail("never conciderd what should happend here! (value pointer print)");
+						inkFail("never considered what should happened here! (value pointer print)");
 					}
 				} break;
 				case Command::LIST: {
@@ -1236,7 +1236,7 @@ void runner_impl::step()
 		}
 
 	}
-#ifndef INK_ENABLE_UNREAL
+#if !defined(INK_ENABLE_UNREAL) && !defined(TARGET_PLAYDATE)
 	catch (...) {
 		// Reset our whole state as it's probably corrupt
 		reset();
