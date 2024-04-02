@@ -1,4 +1,15 @@
-# inkcpp
+# pdinkcpp
+
+## Changes compared to original inkcpp
+
+- Replaced `throw` with playdate's system error (bacause throw won't compile)
+- Link with playdate-cpp-extensions. (added hard dependency on playdate-cpp and playdate-cpp-extensions) (this might be undone if playdate-cpp supports throw)
+
+### Setup
+in CMake:
+1. add `add_subdirectory(<path/to/pdinkcpp/folder>)` (should be after playdate-cpp and playdate-cpp-extensions)
+2. link to **inkcpp_shared** and **inkcpp** :`target_link_libraries(PlaydateProjectName pdcpp inkcpp_shared inkcpp)`
+
 ![build](https://github.com/JBenda/inkcpp/workflows/build/badge.svg "Build Status")
 
 Inkle Ink C++ Runtime with JSON -> Binary Compiler.
