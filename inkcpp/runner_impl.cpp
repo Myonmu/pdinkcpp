@@ -499,6 +499,8 @@ void runner_impl::choose(size_t index)
 {
 	if (has_choices()) {
 		inkAssert(index < _choices.size(), "Choice index out of range");
+	} else if (! _fallback_choice) {
+		inkAssert(false, "No choice and no Fallbackchoice!! can not choose");
 	}
 	_globals->turn();
 	// Get the choice
@@ -526,6 +528,7 @@ void runner_impl::choose(size_t index)
 	_stack.collapse_to_thread(choiceThread);
 	_ref_stack.collapse_to_thread(choiceThread);
 	_threads.clear();
+	_eval.clear();
 
 	// Jump to destination and clear choice list
 	jump(_story->instructions() + c.path(), true);
@@ -778,7 +781,7 @@ void runner_impl::step()
 				case Command::INT: {
 					int val = read<int>();
 					if (_evaluation_mode) {
-						_eval.push(value{}.set<value_type::int32>(val));
+						_eval.push(value{}.set<value_type::int32>(static_cast<int32_t>(val)));
 					}
 					// TEST-CASE B006 don't print integers
 				} break;
@@ -1008,7 +1011,7 @@ void runner_impl::step()
 					hash_t functionName = read<hash_t>();
 
 					// Interpret flag as argument count
-					int numArguments = ( int ) flag;
+					int numArguments = static_cast<int>(flag);
 
 					// find and execute. will automatically push a valid if applicable
 					auto* fn = _functions.find(functionName);
@@ -1197,11 +1200,11 @@ void runner_impl::step()
 					// Push the visit count for the current container to the top
 					//  is 0-indexed for some reason. idk why but this is what ink expects
 					_eval.push(
-					    value{}.set<value_type::int32>(( int ) _globals->visits(_container.top().id) - 1)
+					    value{}.set<value_type::int32>(static_cast<int32_t>(_globals->visits(_container.top().id) - 1))
 					);
 				} break;
 				case Command::TURN: {
-					_eval.push(value{}.set<value_type::int32>(( int ) _globals->turns()));
+					_eval.push(value{}.set<value_type::int32>(static_cast<int32_t>(_globals->turns())));
 				} break;
 				case Command::SEQUENCE: {
 					// TODO: The C# ink runtime does a bunch of fancy logic
@@ -1226,7 +1229,7 @@ void runner_impl::step()
 					container_t container = read<container_t>();
 
 					// Push the read count for the requested container index
-					_eval.push(value{}.set<value_type::int32>(( int ) _globals->visits(container)));
+					_eval.push(value{}.set<value_type::int32>(static_cast<int32_t>(_globals->visits(container))));
 				} break;
 				case Command::TAG: {
 					_tags.push() = read<const char*>();
